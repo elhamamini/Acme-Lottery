@@ -1,0 +1,332 @@
+<html lang="en">
+  <head>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
+    <style>
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: dodgerblue;
+        color: navy;
+        height: 3rem;
+      }
+      .selected {
+        background-color: white;
+        padding: 1rem;
+      }
+      #navBar {
+        background-color: tomato;
+        padding: 0 20rem 0 20rem;
+      }
+      h1 {
+        text-align: center;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+        font-size: xx-large;
+        font-weight: bold;
+      }
+      input {
+        height: 3rem;
+        width: 3rem;
+      }
+      form {
+        width: 30rem;
+        text-align: center;
+        height: 15rem;
+        border: solid 1px black;
+      }
+      .box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-content: space-between;
+      }
+      .text {
+        margin-top: 1rem;
+        font-weight: 300;
+        font-size: large;
+      }
+      .red {
+        background-color: tomato;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+
+  <script type="text/babel">
+    const { render } = ReactDOM;
+    const root = document.querySelector("#root");
+    const { Component } = React;
+    const { Route, Switch, HashRouter, Link, Redirect } = ReactRouterDOM;
+    const Nav = props => {
+      const path = props.location.pathname;
+      return (
+        <div id="navBar">
+          <nav>
+            <Link to="/home" className={path === "/home" ? "selected" : ""}>
+              Home
+            </Link>
+            <Link
+              to="/games/powerball"
+              className={path === "/games/powerball" ? "selected" : ""}
+            >
+              Powerball
+            </Link>
+            <Link
+              to="/games/megamillions"
+              className={path === "/games/megamillions" ? "selected" : ""}
+            >
+              Mega Millions
+            </Link>
+            <Link
+              to="/games/takefive"
+              className={path === "/games/takefive" ? "selected" : ""}
+            >
+              Take Five
+            </Link>
+          </nav>
+        </div>
+      );
+    };
+    const PowerBall = ({ powerBall }) => {
+      return (
+        <div className="box">
+          <h1>Acme Lottery</h1>
+          <form>
+            <h2>Power Ball</h2>
+            <h3>Winning Numbers:</h3>
+            {powerBall.map(num => (
+              <input type="box" defaultValue={num} key={num} />
+            ))}
+          </form>
+        </div>
+      );
+    };
+    const Mega = ({ megaMillions }) => {
+      return (
+        <div className="box">
+          <h1>Acme Lottery</h1>
+          <form>
+            <h2>Mega Millions</h2>
+            <h3>Winning Numbers:</h3>
+            {megaMillions.map(num => (
+              <input type="box" defaultValue={num} key={num} />
+            ))}
+          </form>
+        </div>
+      );
+    };
+    const Five = ({ takeFive }) => {
+      return (
+        <div className="box">
+          <h1>Acme Lottery</h1>
+          <form>
+            <h2>Take Five</h2>
+            <h3>Winning Numbers:</h3>
+            {takeFive.map(num => (
+              <input type="box" defaultValue={num} key={num} />
+            ))}
+          </form>
+        </div>
+      );
+    };
+
+    class HomePage extends Component {
+      constructor() {
+        super();
+        this.state = {
+          arr: [null, null, null, null, null, null],
+          value: null,
+          message: null
+        };
+      }
+      onClickButton(props) {
+        let count = 0;
+        let last = 0;
+
+        if (this.state.value === null) {
+          this.state.value = "powerBall";
+        }
+        const value = this.state.value;
+        // if (!value) {
+        // value='powerBall';
+        // }
+        console.log("p", props.powerBall);
+        const arr = props[value];
+        console.log("arr", arr);
+
+        for (let i = 0; i < this.state.arr.length - 1; i++) {
+          if (arr[i] === this.state.arr[i] * 1 && i !== arr.length - 1) {
+            count += 1;
+          }
+        }
+
+        if (
+          // i === arr.lenght - 1 &&
+          arr[arr.length - 1] ===
+          this.state.arr[arr.length - 1] * 1
+        ) {
+          last += 1;
+        }
+
+        console.log(count, last);
+
+        this.setState({
+          message: ` You got ${count} regular matches! You got ${last} special matches!`
+        });
+      }
+      render() {
+        // console.log(this.state.value);
+        return (
+          <div className="box">
+            <h1>Acme Lottery</h1>
+            <form onSubmit={ev => ev.preventDefault()}>
+              <h2>Check Your Numbers:</h2>
+              <input
+                type="number"
+                onChange={ev => {
+                  const arr = [...this.state.arr];
+                  arr[0] = ev.target.value;
+                  this.setState({ arr });
+                }}
+              />{" "}
+              <input
+                type="number"
+                onChange={ev => {
+                  const arr = [...this.state.arr];
+                  arr[1] = ev.target.value;
+                  this.setState({ arr });
+                }}
+              />{" "}
+              <input
+                type="number"
+                onChange={ev => {
+                  const arr = [...this.state.arr];
+                  arr[2] = ev.target.value;
+                  this.setState({ arr });
+                }}
+              />{" "}
+              <input
+                type="number"
+                onChange={ev => {
+                  const arr = [...this.state.arr];
+                  arr[3] = ev.target.value;
+                  this.setState({ arr });
+                }}
+              />{" "}
+              <input
+                type="number"
+                onChange={ev => {
+                  const arr = [...this.state.arr];
+                  arr[4] = ev.target.value;
+                  this.setState({ arr });
+                }}
+              />
+              {this.state.value === "megaMillions" ||
+                (this.state.value === "powerBall" && (
+                  <input
+                    className="red"
+                    type="number"
+                    onChange={ev => {
+                      const arr = [...this.state.arr];
+
+                      arr[5] = ev.target.value;
+                      this.setState({ arr });
+                    }}
+                  />
+                ))}
+              <br />
+              <lable>GAME:</lable>
+              <select
+                onChange={ev =>
+                  this.setState({
+                    value: ev.target.value,
+                    message: null
+                  })
+                }
+              >
+                <option value="powerBall">Powerball</option>
+                <option value="megaMillions">Mega Millions</option>
+                <option value="takeFive">Take Five</option>
+              </select>
+              <button onClick={() => this.onClickButton(this.props)}>
+                Check my numbers!!
+              </button>
+            </form>
+            {this.state.message && <div>{this.state.message}</div>}
+            <h3>Rules</h3>
+            <div className="text">
+              Powerball has 5 balls that range from 1-69 and 1 ball that ranges
+              from 1-26
+            </div>
+            <div className="text">
+              Mega Millions has 5 balls that range from 1-70 and 1 ball that
+              ranges from 1-25
+            </div>
+            <div className="text">
+              {" "}
+              Take Five has 5 balls that range from 1-39
+            </div>
+          </div>
+        );
+      }
+    }
+    class App extends Component {
+      constructor() {
+        super();
+        this.state = {
+          powerBall: [],
+          megaMillions: [],
+          takeFive: []
+        };
+      }
+      componentDidMount() {
+        const powerBall = [52, 22, 58, 46, 63, 26];
+        const megaMillions = [60, 5, 68, 47, 43, 2];
+        const takeFive = [35, 36, 13, 34, 10];
+        this.setState({ powerBall, megaMillions, takeFive });
+      }
+      render() {
+        const { powerBall, megaMillions, takeFive } = this.state;
+        return (
+          <HashRouter>
+            <Route component={Nav} />
+            <Switch>
+              <Route
+                path="/home"
+                render={props => (
+                  <HomePage
+                    {...props}
+                    powerBall={powerBall}
+                    megaMillions={megaMillions}
+                    takeFive={takeFive}
+                  />
+                )}
+              />
+
+              <Route
+                path="/games/powerball"
+                render={() => <PowerBall powerBall={powerBall} />}
+              />
+              <Route
+                path="/games/megamillions"
+                render={() => <Mega megaMillions={megaMillions} />}
+              />
+              <Route
+                path="/games/takefive"
+                render={() => <Five takeFive={takeFive} />}
+              />
+              <Redirect to="/home" />
+            </Switch>
+          </HashRouter>
+        );
+      }
+    }
+    render(<App />, root);
+  </script>
+</html>
